@@ -25,24 +25,23 @@ router.route("/")
     password = req.body.password;
     console.log(username,password);
     if(username ==null){
-        result = { type:"error" ,error: 1, message: "Please Input Your Username" };
+        result = { type:"fail" ,error: 1, message: "Please Input Your Username" };
         res.status(401).send(result);
     }else if(password == null){
-        result = { type:"error" ,error: 2, message: "Please Input Your Password" };
+        result = { type:"fail" ,error: 2, message: "Please Input Your Password" };
         res.status(401).send(result);
     }else{
         mUsers.findOne({ where: {userName: username} }).then(function(data) {
             if (data == null) {
-                result = { type:"error" ,error: 3, message: "No Account Have Been Found" };
+                result = { type:"fail" ,error: 3, message: "No Account Have Been Found" };
                 res.status(401).send(result);               
             }else if (!bcrypt.compareSync(password, data.password)) {
-                result = { type:"error" ,error: 4, message: "Input Password was wrong" };
+                result = { type:"fail" ,error: 4, message: "Input Password was wrong" };
                 res.status(401).send(result);                
             }else{
                 jwt.sign({ user: data }, superSecret, { expiresIn: "1h" }, function(err,token) {
-                    current_time=moment().format("yyyy-mm-dd:hh:mm:ss");
-                    console.log(current_time);
-                    result = { type: "success" ,token:token};
+                    time=moment().format("YYYY-MM-DD-ddd|hh:mm:ss");
+                    result = { type: "success" , token : token , createdAt : time , expiresIn : "2 Hours" };
                     res.send(result);
                 });
             }
