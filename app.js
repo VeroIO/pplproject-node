@@ -24,8 +24,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function(req, res) {
+  result={statusCode: 404,error : "Page not found", message : "Don't try do anything,this resource in currently unavailabe"}
+  res.status(404).send(result);
 });
 
 module.exports = app;

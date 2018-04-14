@@ -11,15 +11,6 @@ superSecret = config.secret;
 var multParse = multer();
 //Group Routing
 router.route("/")
-.get(function(req, res) {
-    result = {
-        "errors": {
-            "code":   "403",
-            "title":  "Forbidden",
-        }
-    }
-  res.send(result);  
-})
 .post(multParse.none(),function(req, res) {
     username = req.body.username;
     password = req.body.password;
