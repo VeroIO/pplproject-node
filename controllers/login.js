@@ -7,6 +7,7 @@ var config = require("../config");
 var mUsers = require("../models/users");
 var moment = require("moment");
 superSecret = config.secret;
+rootPHP = config.phpBaseUrl;
 
 var multParse = multer();
 //Group Routing
@@ -15,25 +16,30 @@ router.route("/")
     username = req.body.username;
     password = req.body.password;
     console.log(username,password);
-    if(username ==null){
+    if(username ==null){       
         result = { type:"fail" ,error: 1, message: "Please Input Your Username" };
-        res.status(401).send(result);
+        res.writeHead(301, {Location: rootPHP+"/controllers/cLogin.php?message=" + result.message });
+        res.end();          
     }else if(password == null){
         result = { type:"fail" ,error: 2, message: "Please Input Your Password" };
-        res.status(401).send(result);
+        res.writeHead(301, {Location: rootPHP+"/controllers/cLogin.php?message=" + result.message });
+        res.end();
     }else{
         mUsers.findOne({ where: {userName: username} }).then(function(data) {
             if (data == null) {
                 result = { type:"fail" ,error: 3, message: "No Account Have Been Found" };
-                res.status(401).send(result);               
+                res.writeHead(301, {Location: rootPHP+"/controllers/cLogin.php?message=" + result.message });
+                res.end();              
             }else if (!bcrypt.compareSync(password, data.password)) {
                 result = { type:"fail" ,error: 4, message: "Input Password was wrong" };
-                res.status(401).send(result);                
+                res.writeHead(301, {Location: rootPHP+"/controllers/cLogin.php?message=" + result.message });
+                res.end();               
             }else{
                 jwt.sign({ user: data }, superSecret, { expiresIn: "1h" }, function(err,token) {
                     time=moment().format("YYYY-MM-DD-ddd|hh:mm:ss");
                     result = { type: "success" , token : token , createdAt : time , expiresIn : "2 Hours" };
-                    res.send(result);
+                    res.writeHead(301, {Location: rootPHP+"/controllers/cLogin.php?token=" + result.token });
+                    res.end();
                 });
             }
         });  

@@ -50,7 +50,7 @@ router.route("/forget")
             if (data == null) {
                 result = { type: "fail", error: 2, message: "No account with that email address exists." };
                 res.status(401).send(result);
-            }else if(data.role == "admin"){
+            }else if(data.role == "sysAdmin"){
                 result = { type: "fail", error: 99999999, message: "WTF No way to that" };
                 res.status(400).send(result);
             }else{
@@ -80,4 +80,22 @@ router.route("/reset/:token")
     });
 
 });
-module.exports = router;
+router.route("/deactive")
+.post(multParse.none(),validtoken.isAdmin,function(req, res) {
+    mUsers.findOne({ where: {userName: req.body.deactive_user}}).then(function(data) {
+        data.active = 0
+        data.save();
+        result = { type: "success", message: "You Have Deactive User:" + req.body.deactive_user };
+        res.send(result);        
+    });
+})
+router.route("/active")
+.post(multParse.none(),validtoken.isAdmin,function(req, res) {
+    mUsers.findOne({ where: {userName: req.body.active_user}}).then(function(data) {
+        data.active = 1
+        data.save();
+        result = { type: "success", message: "You Have Active User:" + req.body.active_user };
+        res.send(result);        
+    });
+})
+ module.exports = router;
