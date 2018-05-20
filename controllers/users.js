@@ -30,11 +30,17 @@ router.route("/changepassword")
         const saltRounds = 10;
         var salt = bcrypt.genSaltSync(saltRounds);
         var hash = bcrypt.hashSync(req.body.newpassword, salt);
-        console.log(hash);
-        mUsers.update({ password:hash }, { where: { userName: req.user.userName } }).then(function(user) {
-            result = { type: "succes", message: "Success to Change Password" };
-            res.send(result);
-        });
+        var current_password = req.body.current_password;
+        console.log(current_password);
+        if(bcrypt.compareSync(current_password, req.user.password)){
+            mUsers.update({ password: hash }, { where: { userName: req.user.userName } }).then(function (user) {
+                result = { type: "success", message: "Success to Change Password" };
+                res.send(result);
+            });
+        }else{
+            result = { type: "error", message: "The Current Password Is Wrong" };
+            res.send(result);            
+        }
     }else{
         result = { type: "fail", error: 2, message: "2 Password You Input Is Not Match" };
         res.status(400).send(result);
@@ -83,10 +89,15 @@ router.route("/reset/:token")
 router.route("/deactive")
 .post(multParse.none(),validtoken.isAdmin,function(req, res) {
     mUsers.findOne({ where: {userName: req.body.deactive_user}}).then(function(data) {
-        data.active = 0
-        data.save();
-        result = { type: "success", message: "You Have Deactive User:" + req.body.deactive_user };
-        res.send(result);        
+        if(data.role != "sysAdmin"){
+            data.active = 0
+            data.save();
+            result = { type: "success", message: "You Have Deactive User:" + req.body.deactive_user };
+            res.send(result);   
+        }else{
+            result = { type: "error", message: "You Don't Have Permission To Do This" };
+            res.send(result);               
+        }     
     });
 })
 router.route("/active")
@@ -97,5 +108,23 @@ router.route("/active")
         result = { type: "success", message: "You Have Active User:" + req.body.active_user };
         res.send(result);        
     });
+})
+router.route("/info")
+.get(multParse.none(),validtoken.isAuthenticated,function(req, res) {
+    res.json(req.user);
+})
+router.route("/changerole")
+.get(multParse.none(), validtoken.isAuthenticated, function (req, res) {
+    if (req.query.userName == null && req.query.role != 'admin' && req.query.role != 'sysAdmin'){
+        mUsers.findOne({ where: { userName: req.user.userName } }).then(function (data) {
+            data.role = req.query.role;
+            data.fstLogin = 1;
+            data.save();
+            result = { type: "success", message: "You Have Update Role Of User: " + req.user.userName };
+            res.send(result);
+        });        
+    }else{
+        res.status(401).json({ message: "You Don't Have Permission To Do This" });
+    }
 })
  module.exports = router;

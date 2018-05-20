@@ -10,12 +10,23 @@ var Users = sequelize.define(
     },
     userName: Sequelize.STRING,
     password: Sequelize.STRING,
-    fullName: Sequelize.STRING,
     fstLogin: Sequelize.STRING,
     active: Sequelize.INTEGER,
     role: Sequelize.STRING,
     resetPasswordToken: Sequelize.STRING,
-    resetPasswordExpires: Sequelize.DATE
+    resetPasswordExpires: Sequelize.DATE,
+    firstName: Sequelize.STRING,
+    lastName: Sequelize.STRING,
+    gender: Sequelize.STRING,
+    email: Sequelize.STRING,
+    address: Sequelize.STRING,
+    languages: Sequelize.STRING,
+    website: Sequelize.STRING,
+    workIn: Sequelize.INTEGER,
+    degree: Sequelize.STRING,
+    acceptedInsurance: Sequelize.STRING,
+    specialty: Sequelize.STRING,
+    workHours: Sequelize.INTEGER
   },
   {
     timestamps: false
