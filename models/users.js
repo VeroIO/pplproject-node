@@ -19,6 +19,7 @@ var Users = sequelize.define(
     lastName: Sequelize.STRING,
     gender: Sequelize.STRING,
     email: Sequelize.STRING,
+    hospitalName: Sequelize.STRING,
     address: Sequelize.STRING,
     languages: Sequelize.STRING,
     website: Sequelize.STRING,

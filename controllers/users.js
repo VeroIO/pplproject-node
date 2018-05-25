@@ -127,4 +127,40 @@ router.route("/changerole")
         res.status(401).json({ message: "You Don't Have Permission To Do This" });
     }
 })
+router.route("/setadmin")
+.post(multParse.none(), validtoken.isSysAdmin, function (req, res) {
+    if (req.body.setadmin_user != null){
+        mUsers.findOne({ where: { userName: req.body.setadmin_user } }).then(function (data) {
+            if(data.role != "sysAdmin"){
+                data.role = "admin";
+                data.save();
+                result = { type: "success", message: "You Have Update Role Of User: " + req.body.setadmin_user + " To Admin" };
+                res.send(result);
+            }else{
+                result = { type: "error", message: "HIHI ko dc đâu" };
+                res.send(result);
+            }
+        });        
+    }else{
+        res.status(401).json({ message: "You Don't Have Permission To Do This" });
+    }
+})
+router.route("/unsetadmin")
+.post(multParse.none(), validtoken.isSysAdmin, function (req, res) {
+    if (req.body.unsetadmin_user != null){
+        mUsers.findOne({ where: { userName: req.body.unsetadmin_user } }).then(function (data) {
+            if (data.role != "sysAdmin") {
+                data.role = "user";
+                data.save();
+                result = { type: "success", message: "You Have Update Role Of User: " + req.body.unsetadmin_user + " To User" };
+                res.send(result);
+            } else {
+                result = { type: "error", message: "HIHI ko dc đâu" };
+                res.send(result);         
+            }
+        });        
+    }else{
+        res.status(401).json({ message: "You Don't Have Permission To Do This" });
+    }
+})
  module.exports = router;
