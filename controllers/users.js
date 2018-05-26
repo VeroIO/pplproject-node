@@ -163,4 +163,46 @@ router.route("/unsetadmin")
         res.status(401).json({ message: "You Don't Have Permission To Do This" });
     }
 })
+router.route("/update_patient")
+.post(multParse.none(), validtoken.isAuthenticated, function (req, res) {
+    mUsers.findOne({ where: { userName: req.user.userName } }).then(function (data) {
+        data.firstName = req.body.firstName;
+        data.lastName = req.body.lastName;
+        data.gender = req.body.gender;
+        data.email = req.body.email;
+        data.address = req.body.address;
+        data.languages = req.body.language;
+        data.save();
+        result = { type: "success", message: "Success To Change Your Profile" };
+        res.send(result);        
+    });
+})
+router.route("/update_hospital")
+.post(multParse.none(), validtoken.isAuthenticated, function (req, res) {
+    mUsers.findOne({ where: { userName: req.user.userName } }).then(function (data) {
+        data.firstName = req.body.firstName;
+        data.lastName = req.body.lastName;
+        data.hospitalName = req.body.hospitalName;
+        data.email = req.body.email;
+        data.address = req.body.address;
+        data.save();
+        result = { type: "success", message: "Success To Change Your Profile" };
+        res.send(result);        
+    });
+})
+router.route("/update_doctor")
+.post(multParse.none(), validtoken.isAuthenticated, function (req, res) {
+    mUsers.findOne({ where: { userName: req.user.userName } }).then(function (data) {
+        data.firstName = req.body.firstName;
+        data.lastName = req.body.lastName;
+        data.acceptedInsurance = req.body.acceptedInsurance;
+        data.degree = req.body.degree;
+        data.email = req.body.email;
+        data.languages = req.body.language;
+        data.gender = req.body.gender;
+        data.save();
+        result = { type: "success", message: "Success To Change Your Profile" };
+        res.send(result);        
+    });
+})
  module.exports = router;

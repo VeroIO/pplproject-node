@@ -45,7 +45,7 @@ router.route("/")
                 var hash = bcrypt.hashSync(password, salt);
                 var newUser = { userName: username, password: hash , fstLogin : 0 , active : 1 , role : 'user' };
                 mUsers.create(newUser).then(function(data) {
-                    result = { type: "success", message: "Success to register" ,data:data };
+                    result = { type: "success", message: "Register Successfully" ,data:data };
                     res.writeHead(301, {Location: rootPHP+"/controllers/cRegister.php?message=" + result.message + "&type=" + result.type });
                     res.end();
                 })                       
