@@ -298,4 +298,13 @@ router.route("/get_working_hours")
         res.send(data);
     });
 });
+router.route("/doctorprofile")
+.get(function(req, res) {
+    mUsers.findOne({ where: { id: req.query.id } }).then(function (data1) {
+        mWorkingHours.findOne({ where: { parrent_id: req.query.id } }).then(function (data2) {
+            result = {data:data1,workingHours:data2};
+            res.send(result);
+        });        
+    });
+});
  module.exports = router;
