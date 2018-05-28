@@ -8,6 +8,7 @@ var config = require("../config");
 var mUsers = require("../models/users");
 var mWorkingHours = require("../models/workingHours");
 var mBoookmarks = require("../models/bookmarks");
+var mComments = require("../models/comments");
 var moment = require("moment");
 var validtoken = require("../controllers/authController");
 var cryptoRandomString = require("crypto-random-string");
@@ -337,4 +338,50 @@ router.route("/bookmark")
         res.send(data);
     });
 });
- module.exports = router;
+router.route("/postcmt")
+.post(multParse.none(), validtoken.isAuthenticated,function(req, res) {
+    var newComment = {
+        parrent_id: req.user.id,
+        parrent_name : req.user.userName,
+        cmt_for : req.body.cmt_for,
+        content : req.body.content,
+        status : '1',
+        rating : req.body.rating
+    };
+    mComments.create(newComment).then(function(data) {
+      result = { type: "success", message: "Comment Successful", data: data };
+      res.send(result);
+    });
+});
+
+router.route("/get_list_cmt")
+.get(multParse.none(), validtoken.isAuthenticated,function(req, res) {
+    mComments.findAll({ where: { cmt_for: req.query.id } }).then(function (data) {
+        res.send(data);
+    });
+});
+router.route("/disable_cmt")
+.post(multParse.none(),validtoken.isAdmin,function(req, res) {
+    mComments.findOne({ where: {id: req.body.id}}).then(function(data) {
+        if(data.role != "sysAdmin"){
+            data.status = 0
+            data.save();
+            result = { type: "success", message: "You Have Deactive Comment:" + req.body.id };
+            res.send(result);   
+        }else{
+            result = { type: "error", message: "You Don't Have Permission To Do This" };
+            res.send(result);               
+        }     
+    });
+})
+router.route("/able_cmt")
+.post(multParse.none(),validtoken.isAdmin,function(req, res) {
+    mComments.findOne({ where: {id: req.body.id}}).then(function(data) {
+        data.status = 1
+        data.save();
+        result = { type: "success", message: "You Have Active Comment:" + req.body.id };
+        res.send(result);        
+    });
+})
+
+module.exports = router; 
