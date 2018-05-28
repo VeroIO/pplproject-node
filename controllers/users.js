@@ -7,6 +7,7 @@ var nodemailer = require("nodemailer");
 var config = require("../config");
 var mUsers = require("../models/users");
 var mWorkingHours = require("../models/workingHours");
+var mBoookmarks = require("../models/bookmarks");
 var moment = require("moment");
 var validtoken = require("../controllers/authController");
 var cryptoRandomString = require("crypto-random-string");
@@ -305,6 +306,35 @@ router.route("/doctorprofile")
             result = {data:data1,workingHours:data2};
             res.send(result);
         });        
+    });
+});
+router.route("/mark")
+.post(multParse.none(), validtoken.isAuthenticated,function(req, res) {
+    var newBookmark = {
+        parrent_id: req.user.id,
+        bookmarked_id: req.body.mark_id,
+    };
+    mBoookmarks.create(newBookmark).then(function(data) {
+      result = { type: "success", message: "Success To Create New Bookmark", data: data };
+      res.send(result);
+    });
+});
+router.route("/unmark")
+.post(multParse.none(), validtoken.isAuthenticated,function(req, res) {
+    mBoookmarks.destroy({ where: { bookmarked_id: req.body.unmark_id, parrent_id: req.user.id } }).then(function (results) {
+        if (results == 1) {
+            result = { type: "success", message: "Đã Thành Xóa Thành Công ID:" + req.body.unmark_id };
+            res.json(result);
+        } else {
+            result = { type: "error", message: "Thao Tác Không Thành Công" };
+            res.json(result);
+        }
+    });
+});
+router.route("/bookmark")
+.get(multParse.none(), validtoken.isAuthenticated,function(req, res) {
+    mBoookmarks.findAll({ where: { parrent_id: req.user.id } }).then(function (data) {
+        res.send(data);
     });
 });
  module.exports = router;
